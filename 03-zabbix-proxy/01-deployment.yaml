@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zabbix-proxy
+  labels:
+    app.kubernetes.io/name: zabbix-proxy
+    app: zabbix-proxy
+    provider: zabbix
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+       app.kubernetes.io/name: zabbix-proxy
+  serviceName: "zabbix-proxy"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: zabbix-proxy
+    spec:   
+      containers:
+      - name: zabbix-proxy
+        image: localhost:5000/zabbix-proxy:6.4.19
+        imagePullPolicy: IfNotPresent
+        command: ["supervisord", "-c", "/etc/supervisor/conf.d/docker.conf"]
+        resources:
+          requests:
+            memory: "1144Mi"
+            cpu: "1000m"
+          limits:
+            memory: "2216Mi"
+            cpu: "2000m"
+        env:
+        - name: ZABBIX_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: zabbix-api-token
+              key: api_token
+        ports:
+        - containerPort: 10050
+          name: zabbix-port      
+        volumeMounts:
+        - mountPath: /etc/supervisor/conf.d/docker.conf
+          subPath: supervisord.conf
+          name: supervisord
+        - mountPath: /etc/zabbix/zabbix_proxy.conf
+          subPath: zabbix_proxy.conf
+          name: zabbix-proxy-conf
+      imagePullSecrets:
+      - name: registry-bind-credentials
+      volumes:
+        - name: supervisord
+          configMap:
+            name: zabbix-proxy-supervisord
+        - name: zabbix-proxy-conf
+          configMap:
+            name: zabbix-proxy-config

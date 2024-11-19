@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: monitoring
+  labels:
+    zabbix-app: zabbix-agent
+  name: zabbix-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      zabbix-app: zabbix-agent
+  serviceName: "zabbix-agent"
+  template:
+    metadata:
+      labels:
+        zabbix-app: zabbix-agent
+    spec:   
+      containers:
+      - name: zabbix-agent
+        image: localhost:5000/zabbix-agent:6.4.19.2
+        imagePullPolicy: IfNotPresent
+        command: ["supervisord", "-c", "/etc/supervisor/conf.d/docker.conf"]
+        resources:
+          requests:
+            memory: "1144Mi"
+            cpu: "1000m"
+          limits:
+            memory: "2216Mi"
+            cpu: "2000m"
+        ports:
+        - containerPort: 10050
+          name: zabbix-port
+        volumeMounts:
+        - mountPath: /etc/supervisor/conf.d/docker.conf
+          subPath: supervisord.conf
+          name: supervisord
+        - mountPath: /etc/zabbix/zabbix_agent2.conf
+          subPath: zabbix_agent2.conf
+          name: zabbix-agent-conf
+      imagePullSecrets:
+      - name: registry-bind-credentials
+      volumes:
+        - name: supervisord
+          configMap:
+            name: zabbix-agent-supervisord
+        - name: zabbix-agent-conf
+          configMap:
+            name: zabbix-agent-config

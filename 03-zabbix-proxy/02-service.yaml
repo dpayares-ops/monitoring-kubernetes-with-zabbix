@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zabbix-proxy
+  labels:
+    app.kubernetes.io/name: zabbix-proxy
+    app: zabbix-proxy
+  namespace: monitoring
+spec:
+  selector:
+    app: zabbix-proxy
+  type: ClusterIP
+  ports:
+    - name: zabbix-proxy
+      port: 10051
+      targetPort: 10051
