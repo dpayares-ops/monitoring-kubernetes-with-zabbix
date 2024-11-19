@@ -15,3 +15,6 @@ Revisar:
 kubectl get clusterrole zabbix-clusterrole
 
 kubectl get serviceaccount zabbix-service-account -n monitoring
+
+Fuentes:
+https://www.zabbix.com/integrations/kubernetes
