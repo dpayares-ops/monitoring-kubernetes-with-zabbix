@@ -11,7 +11,7 @@ kubectl get secret zabbix-api-token -n monitoring -o jsonpath={.data.api_token} 
 
 
 
-
+Revisar:
 kubectl get clusterrole zabbix-clusterrole
 
 kubectl get serviceaccount zabbix-service-account -n monitoring

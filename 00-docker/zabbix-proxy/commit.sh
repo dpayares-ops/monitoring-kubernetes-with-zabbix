@@ -7,7 +7,7 @@ TAG=${1}
 sed -i "s/=TRUE/=FALSE/" release.sh
 
 #commit to git
-echo $TAG > VERSION.zabbix-proxy-bind
+echo $TAG > VERSION.zabbix-proxy
 
 git commit -am v$TAG
 git tag -a v$TAG -m 'version '$TAG
